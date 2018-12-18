@@ -1,0 +1,9 @@
+using System.Net;
+                            
+var url = "https://newsapi.org/v2/top-headlines?" +
+          "country=us&" +
+          "apiKey=f8f3dee3f2524f47a1309bc2381b8cb2";
+                            
+var json = new WebClient().DownloadString(url);
+                            
+Console.WriteLine(json);
