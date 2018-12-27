@@ -1,0 +1,17 @@
+//Construct a server address structure                                           
+
+struct sockaddr_in servaddr;
+memset(&servaddr, 0, sizeOf(servaddr));
+servaddr.sin_family      = AF_INET;
+servaddr.sin_addr.s_addr = inet_addr(serverIP);
+servaddr.sin_port        = htons(port);
+
+//Establish a TCP connection to the server                                       
+if (connect(sock, (struct sockaddr *) & servaddr, sizeOf(servaddr)) < 0)
+  die("connect failed");
+
+char httpGetRequest[256];
+snprintf(httpGetRequest, sizeOf(httpGetRequest), "GET %s HTTP/1.0\r\nHost: %s:%d\
+\r\n\r\n", url, serverName, port);
+
+//send the HTTP Get request                                                      
