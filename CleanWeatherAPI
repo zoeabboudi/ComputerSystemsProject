@@ -1,0 +1,78 @@
+/*
+ * adder.c - a minimal CGI program that subtracts two numbers
+ */
+/* $begin adder */
+#include "../csapp.h"
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+
+int main(int argc, char **argv){
+    
+    char *zipcode, *urlBegin, *urlEnd, *s;
+    char arg1[MAXLINE], arg2[MAXLINE], content[MAXLINE];
+
+    int n1=0, n2=0;
+
+    /* Extract the zipCode */
+    zipcode = strncat(getenv("QUERY_STRING"), "\0", 5);
+    
+
+    //urlBegin ="/data/2.5/weather?zip=";
+    //urlEnd = ",us&units=imperial&APPID=364ebbea13d49a5e8e505870368c78be";
+    //s = strcat(urlBegin, zipcode);
+    // s = strcat(s, urlEnd);
+    //sprintf(content, "%s \n<p>", s);
+
+    char *host, *port;
+    rio_t rio;
+    char buf[MAXLINE];
+    char buf2[MAXLINE];
+    int clientfd, n;
+    // THIS IS WHERE ECHOclient  COMES IN
+   
+    sprintf(buf, "GET /data/2.5/weather?zip=%s,us&units=imperial&APPID=364ebbea13d49a5e8e505870368c78be\n", zipcode);
+    
+    
+    host  = "162.243.53.59";
+    //"192.241.169.168"
+//http://www.openweathermap.org";
+    port = "80";
+    
+    fprintf(stderr, "about to do clientfd\n");
+    
+    clientfd = Open_clientfd(host, port);
+    Rio_readinitb(&rio,clientfd);
+
+    if (clientfd == -1) {
+      fprintf(stderr, "ERROR: connection could not be established.");
+    }
+
+    char response[MAXLINE];    
+    Rio_writen(clientfd, buf, MAXLINE);
+    Rio_readlineb(&rio, buf2, MAXLINE);   /// buf2 has our output
+    Close(clientfd);
+    fprintf(stderr, "%s", buf2);
+
+    fprintf(stderr, "made it to the JSON output\n ");
+    char *response_split;  // split response on 1st occurence
+    response_split = strchr(buf2, '[');
+    *response_split = '\0';
+    //strcpy(response, response_split +1);
+    
+    
+   
+    sprintf(content,"<html><body style='background-color:#AED6F1;'><style>h1{color:#1B4F72}h2{color:#196F3D}</style><center><h1>Your Weather</h1><h2> brought to you by <strong>Mori and Zoe</strong></h2><p><img src='sunshine.jpeg' alt='sunshine' width='200'></p><h1>Your zipcode: %s </h1><h2>the temperature outside:</h2></center></body></html>", zipcode, zipcode);
+  
+    /* Generate the HTTP response */
+    printf("Connection: close\r\n");
+    printf("Content-length: %d\r\n", (int)strlen(content));
+    printf("Content-type: text/html\r\n\r\n");
+    printf("%s", content);
+    fflush(stdout);
+
+    exit(0);
+}
