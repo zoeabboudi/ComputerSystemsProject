@@ -12,13 +12,22 @@
 
 int main(int argc, char **argv){
     
-    char *zipcode, *urlBegin, *urlEnd, *s;
-    char arg1[MAXLINE], arg2[MAXLINE], content[MAXLINE];
+  char *urlBegin, *urlEnd, *s,  *input;
+  char arg1[MAXLINE], arg2[MAXLINE], content[MAXLINE], zipcode[MAXLINE];
 
     int n1=0, n2=0;
-
+    int zip;
     /* Extract the zipCode */
-    zipcode = strncat(getenv("QUERY_STRING"), "\0", 5);
+    
+    input = strncat(getenv("QUERY_STRING"), "\0", 5);
+    fprintf(stderr, "this is input: %s\n", input);
+    sscanf(input, "zipcode=%d", &zip);
+    fprintf(stderr, "\nthe zipcode you entered is: %d\n", zip);
+    
+    sprintf(zipcode, "%d", zip);
+    fprintf(stderr, "this is zipcode: %s \n", zipcode);
+    
+    
     
 
     //urlBegin ="/data/2.5/weather?zip=";
@@ -65,7 +74,7 @@ int main(int argc, char **argv){
     
     
    
-    sprintf(content,"<html><body style='background-color:#AED6F1;'><style>h1{color:#1B4F72}h2{color:#196F3D}</style><center><h1>Your Weather</h1><h2> brought to you by <strong>Mori and Zoe</strong></h2><p><img src='sunshine.jpeg' alt='sunshine' width='200'></p><h1>Your zipcode: %s </h1><h2>the temperature outside:</h2></center></body></html>", zipcode, zipcode);
+    sprintf(content,"<html><body style='background-color:#AED6F1;'><style>h1{color:#1B4F72}h2{color:#196F3D}</style><center><h1>Your Weather</h1><h2> brought to you by <strong>Mori and Zoe</strong></h2><p><img src='sunshine.jpeg' alt='sunshine' width='200'></p><h1>Enter Your zipcode:</h1><form action='/cgi-bin/htmlVersion?'><input type='text' name='zipcode'><br><input type='submit' value='Submit'></form><h2>the temperature outside:</h2></center></body></html>", zipcode, zipcode);
   
     /* Generate the HTTP response */
     printf("Connection: close\r\n");
