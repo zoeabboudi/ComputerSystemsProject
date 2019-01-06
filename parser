@@ -1,7 +1,7 @@
 char mainstring[MAXLINE];
 //mainstring = full son that was returned    
-char substring[20], *ret;
-substring = "temp";
+char *ret;
+char substring[20] = "temp";
 int i=0;
 substring[strlen(substring)-1]='\0';                                      
 ret=strstr(mainstring,substring);                                         
