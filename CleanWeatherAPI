@@ -27,53 +27,53 @@ int main(int argc, char **argv){
     sprintf(zipcode, "%d", zip);
     fprintf(stderr, "this is zipcode: %s \n", zipcode);
     
-    
-    
+    //fprintf(stderr, "\nthis is null %s\n", zipcode[0]);
+    fprintf(stderr, "strlen is %d", strlen(zipcode));
 
-    //urlBegin ="/data/2.5/weather?zip=";
-    //urlEnd = ",us&units=imperial&APPID=364ebbea13d49a5e8e505870368c78be";
-    //s = strcat(urlBegin, zipcode);
-    // s = strcat(s, urlEnd);
-    //sprintf(content, "%s \n<p>", s);
+    // only ask server for weather is user entered a valid zipcode
+    if (strlen(zipcode) ==5){
+      fprintf(stderr, "\nzipcode has something  in it!\n");
 
-    char *host, *port;
-    rio_t rio;
-    char buf[MAXLINE];
-    char buf2[MAXLINE];
-    int clientfd, n;
-    // THIS IS WHERE ECHOclient  COMES IN
+    
+      char *host, *port;
+      rio_t rio;
+      char buf[MAXLINE];
+      char buf2[MAXLINE];
+      int clientfd, n;
+      // THIS IS WHERE ECHOclient  COMES IN
    
-    sprintf(buf, "GET /data/2.5/weather?zip=%s,us&units=imperial&APPID=364ebbea13d49a5e8e505870368c78be\n", zipcode);
+      sprintf(buf, "GET /data/2.5/weather?zip=%s,us&units=imperial&APPID=364ebbea13d49a5e8e505870368c78be\n", zipcode);
     
     
-    host  = "162.243.53.59";
-    //"192.241.169.168"
-//http://www.openweathermap.org";
-    port = "80";
+      host  = "162.243.53.59";
+      //"192.241.169.168"
+      //http://www.openweathermap.org";
+      port = "80";
     
-    fprintf(stderr, "about to do clientfd\n");
+      fprintf(stderr, "about to do clientfd\n");
     
-    clientfd = Open_clientfd(host, port);
-    Rio_readinitb(&rio,clientfd);
+      clientfd = Open_clientfd(host, port);
+      Rio_readinitb(&rio,clientfd);
 
-    if (clientfd == -1) {
-      fprintf(stderr, "ERROR: connection could not be established.");
+      if (clientfd == -1) {
+	fprintf(stderr, "ERROR: connection could not be established.");
+      }
+
+      char response[MAXLINE];    
+      Rio_writen(clientfd, buf, MAXLINE);
+      Rio_readlineb(&rio, buf2, MAXLINE);   /// buf2 has our output
+      Close(clientfd);
+      fprintf(stderr, "%s", buf2);
+
+      fprintf(stderr, "made it to the JSON output\n ");
+      char *response_split;  // split response on 1st occurence
+      response_split = strchr(buf2, '[');
+      *response_split = '\0';
+      //strcpy(response, response_split +1);
+    
     }
 
-    char response[MAXLINE];    
-    Rio_writen(clientfd, buf, MAXLINE);
-    Rio_readlineb(&rio, buf2, MAXLINE);   /// buf2 has our output
-    Close(clientfd);
-    fprintf(stderr, "%s", buf2);
-
-    fprintf(stderr, "made it to the JSON output\n ");
-    char *response_split;  // split response on 1st occurence
-    response_split = strchr(buf2, '[');
-    *response_split = '\0';
-    //strcpy(response, response_split +1);
     
-    
-   
     sprintf(content,"<html><body style='background-color:#AED6F1;'><style>h1{color:#1B4F72}h2{color:#196F3D}</style><center><h1>Your Weather</h1><h2> brought to you by <strong>Mori and Zoe</strong></h2><p><img src='sunshine.jpeg' alt='sunshine' width='200'></p><h1>Enter Your zipcode:</h1><form action='/cgi-bin/htmlVersion?'><input type='text' name='zipcode'><br><input type='submit' value='Submit'></form><h2>the temperature outside:</h2></center></body></html>", zipcode, zipcode);
   
     /* Generate the HTTP response */
