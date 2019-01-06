@@ -1,0 +1,13 @@
+char mainstring[MAXLINE];
+//mainstring = full son that was returned    
+char substring[20], *ret;
+substring = "temp";
+int i=0;
+substring[strlen(substring)-1]='\0';                                      
+ret=strstr(mainstring,substring);                                         
+if(strcmp((ret=strstr(mainstring,substring)),substring)){
+     //printf("substring is present\n"); 
+     for(i=6; i<11; i++){
+        printf("%c", *(ret+i));
+      }
+}
