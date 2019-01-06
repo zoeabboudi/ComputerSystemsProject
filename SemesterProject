@@ -1,0 +1,107 @@
+
+#include "../csapp.h"
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+
+int main(int argc, char **argv){
+    
+  char *urlBegin, *urlEnd, *s,  *input;
+  char arg1[MAXLINE], arg2[MAXLINE], content[MAXLINE], zipcode[MAXLINE], temp[MAXLINE];
+
+   
+    int zip;
+    /* Extract the zipCode */
+    
+    input = strncat(getenv("QUERY_STRING"), "\0", 5);
+    fprintf(stderr, "this is input: %s\n", input);
+    sscanf(input, "zipcode=%d", &zip);
+    fprintf(stderr, "\nthe zipcode you entered is: %d\n", zip);
+    
+    sprintf(zipcode, "%d", zip);
+    fprintf(stderr, "this is zipcode: %s \n", zipcode);
+    
+    //fprintf(stderr, "\nthis is null %s\n", zipcode[0]);
+    fprintf(stderr, "strlen is %d", strlen(zipcode));
+
+    // only ask server for weather is user entered a valid zipcode
+    if (strlen(zipcode) ==5){
+      fprintf(stderr, "\nzipcode has something  in it!\n");
+
+    
+      char *host, *port;
+      rio_t rio;
+      char buf[MAXLINE];
+      char mainstring[MAXLINE];
+      int clientfd, n;
+      // THIS IS WHERE ECHOclient  COMES IN
+   
+      sprintf(buf, "GET /data/2.5/weather?zip=%s,us&units=imperial&APPID=364ebbea13d49a5e8e505870368c78be\n", zipcode);
+    
+    
+      host  = "162.243.53.59";
+    
+      port = "80";
+    
+      fprintf(stderr, "about to do clientfd\n");
+    
+      clientfd = Open_clientfd(host, port);
+      Rio_readinitb(&rio,clientfd);
+
+      if (clientfd == -1) {
+	fprintf(stderr, "ERROR: connection could not be established.");
+      }
+
+      char response[MAXLINE];    
+      Rio_writen(clientfd, buf, MAXLINE);
+      Rio_readlineb(&rio, mainstring, MAXLINE);   /// buf2 has our output
+      Close(clientfd);
+      fprintf(stderr, "%s", mainstring);
+      
+
+      // fprintf(stderr, "made it to the JSON output\n ");
+      //char *response_split;  // split response on 1st occurence
+      //response_split = strchr(mainstring, '[');
+      // *response_split = '\0';
+      //strcpy(response, response_split +1);
+    
+    
+
+      //char mainstring[MAXLINE];
+//mainstring = full son that was returned    
+      char substring[20], *ret;
+      sprintf(substring,"temp");
+      fprintf(stderr, "\nthis is substring %s\n", substring);
+int i=0;
+//substring[strlen(substring)]='\0';
+ fprintf(stderr, "\n now substring is %s\n", substring);
+ fprintf(stderr, "\n this is mainstring %s\n", mainstring);
+ret=strstr(mainstring,substring);
+ fprintf(stderr, "\nret = %s\n", ret);
+//if(strcmp((ret=strstr(mainstring,substring)),substring)){
+     //printf("substring is present\n"); 
+     //for(i=6; i<11; i++){
+     temp[0] = *(ret+6);
+     temp[1] = *(ret+7);
+     //temp[2] = *(ret+8);
+     //temp[3] = *(ret+8);
+     //temp[4] = *(ret+9);
+     //temp[5] = "\0";
+       
+
+    }
+    fprintf(stderr, "this is temp %s\n", temp);
+    sprintf(content,"<html><body style='background-color:#AED6F1;'><style>h1{color:#1B4F72}h2{color:#196F3D}</style><center><h1>Your Weather</h1><h2> brought to you by <strong>Mori and Zoe</strong></h2><p><img align='middle' src='sunshine.jpeg' alt='sunshine' width='200'></p><h1>Enter Your zipcode: %s</h1><form action='/cgi-bin/SemesterProject?'><input type='text' name='zipcode'><br><input type='submit' value='Submit'></form><h2>the temperature outside:</h2><h1>%s</h1></center></body></html>",  zipcode, temp);
+  
+    /* Generate the HTTP response */
+    printf("Connection: close\r\n");
+    printf("Content-length: %d\r\n", (int)strlen(content));
+    printf("Content-type: text/html\r\n\r\n");
+    printf("%s", content);
+    fflush(stdout);
+
+    exit(0);
+}
