@@ -1,19 +1,20 @@
 CC = gcc
-CFLAGS = -O2 -Wall -I $(CSAPP_INC) -I .
-CSAPP_SRC = ../../../src
+
 CSAPP_INC = ../../../include
+CSAPP_SRC = ../../../src
 
-all:  $(CSAPP_SRC)/csapp.o weatherAPI
+CFLAGS = -Wall -O2 -I $(CSAPP_INC) -I .
+LDLIBS = -lpthread
 
-$(CSAPP_SRC)/csapp.c:
-	$(CSAPP_SRC)/csapp.c
-
+all: $(CSAPP_SRC)/csapp.o  SemesterProject
+$(PROGS): $(CSAPP_SRC)/csapp.o
 $(CSAPP_SRC)/csapp.o: $(CSAPP_SRC)/csapp.c $(CSAPP_INC)/csapp.h
 
-weatherAPI: weatherAPI.c csapp.c
-	$(CC) $(CFLAGS) -o weatherAPI weatherAPI.c
-
+tiny/tiny: tiny/tiny.c
+        (cd tiny; make)CC = gcc
+SemesterProject: SemesterProject.c $(CSAPP_SRC)/csapp.o
+        $(CC) $(CFLAGS) -o SemesterProject SemesterProject.c $(CSAPP_SRC)/csapp.o -lpthread
 
 clean:
-	rm -f weatherAPI *~
-
+        rm -f SemesterProject *~
+                                                                                                                  
